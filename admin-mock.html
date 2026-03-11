@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チケット管理 — モック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #F2F1ED;
+  --card:  #FFFFFF;
+  --ink:   #18181B;
+  --muted: #8A8A85;
+  --rule:  #E6E4DC;
+  --green: #1A6645;
+  --red:   #9E2F27;
+  --amber: #92610A;
+  --blue:  #1D4ED8;
+  --tag-bg:#F0EEE8;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+}
+
+.container { max-width: 860px; margin: 0 auto; }
+
+/* ── Header ── */
+header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--ink);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.logo-text {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.last-upd {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.refresh-btn {
+  padding: 7px 16px;
+  border: 1px solid var(--rule);
+  background: var(--card);
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  transition: background .12s;
+  letter-spacing: .02em;
+}
+.refresh-btn:hover { background: var(--rule); }
+
+/* ── Stats ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 20px 20px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.stat-card.c-default::after { background: var(--rule); }
+.stat-card.c-green::after   { background: var(--green); }
+.stat-card.c-red::after     { background: var(--red); }
+.stat-card.c-amber::after   { background: var(--amber); }
+
+.stat-label {
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+
+.stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.stat-val.green { color: var(--green); }
+.stat-val.red   { color: var(--red); }
+.stat-val.amber { color: var(--amber); }
+
+.stat-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+  letter-spacing: .02em;
+}
+
+/* ── Panel ── */
+.panel {
+  background: var(--card);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.panel-head {
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panel-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+
+.panel-body { padding: 20px 22px; }
+
+/* ── Settings ── */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field-label {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 110px;
+  letter-spacing: .02em;
+}
+
+.field-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 9px 13px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  background: #FAFAF8;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29,78,216,.08);
+}
+
+.field-hint {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  background: var(--tag-bg);
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.save-btn {
+  padding: 9px 20px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.save-btn:hover { opacity: .74; }
+
+.save-ok {
+  font-size: 10px;
+  color: var(--green);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Table ── */
+.tbl-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tbl-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead th {
+  padding: 9px 16px;
+  text-align: left;
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 400;
+  background: #FAFAF8;
+  border-bottom: 1px solid var(--rule);
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--rule);
+  transition: background .08s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #FAFAF8; }
+
+td {
+  padding: 12px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink);
+  vertical-align: middle;
+}
+td.muted { color: var(--muted); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 9px;
+  letter-spacing: .1em;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+.badge.used    { background: var(--ink); color: #fff; }
+.badge.unused  { background: var(--tag-bg); color: var(--muted); }
+
+.badge::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+.badge.used::before   { background: rgba(255,255,255,.5); }
+.badge.unused::before { background: var(--muted); }
+
+@media (max-width: 520px) {
+  .col-created, .col-token-full { display: none; }
+}
+
+/* ── Pagination hint ── */
+.tbl-footer {
+  padding: 13px 22px;
+  border-top: 1px solid var(--rule);
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  background: #FAFAF8;
+  border-radius: 0 0 10px 10px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">🎟</div>
+      <div class="logo-text">チケット管理</div>
+    </div>
+    <div class="header-right">
+      <span class="last-upd">最終更新: 14:32:05</span>
+      <button class="refresh-btn">↻ &ensp;更新</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card c-default">
+      <div class="stat-label">上限枚数</div>
+      <div class="stat-val">1,400</div>
+      <div class="stat-sub">設定値</div>
+    </div>
+    <div class="stat-card c-amber">
+      <div class="stat-label">発行済み</div>
+      <div class="stat-val amber">847</div>
+      <div class="stat-sub">60.5%</div>
+    </div>
+    <div class="stat-card c-green">
+      <div class="stat-label">残り枚数</div>
+      <div class="stat-val green">553</div>
+      <div class="stat-sub">発行可能</div>
+    </div>
+    <div class="stat-card c-red">
+      <div class="stat-label">使用済み</div>
+      <div class="stat-val red">312</div>
+      <div class="stat-sub">景品交換済み</div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">設定</span>
+      <span style="font-size:10px;color:var(--muted);">変更は即時反映されます</span>
+    </div>
+    <div class="panel-body">
+      <div class="settings-grid">
+
+        <div class="field-row">
+          <span class="field-label">上限枚数</span>
+          <input class="field-input" type="number" placeholder="1400" style="max-width:140px;">
+          <button class="save-btn" onclick="showSaved(this, 'st-limit')">保存</button>
+          <span class="save-ok" id="st-limit" style="display:none;">✓ 保存しました</span>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">有効期限（日数）</span>
+          <input class="field-input" type="number" placeholder="30" style="max-width:140px;">
+          <button class="save-btn" onclick="showSaved(this, 'st-ttl')">保存</button>
+          <span class="save-ok" id="st-ttl" style="display:none;">✓ 保存しました</span>
+          <span class="field-hint">発行日から起算</span>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Cluster URL</span>
+          <input class="field-input" type="url" placeholder="https://cluster.mu/r/roomname" style="max-width:320px;">
+          <button class="save-btn" onclick="showSaved(this, 'st-url')">保存</button>
+          <span class="save-ok" id="st-url" style="display:none;">✓ 保存しました</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">使用済みチケット一覧</span>
+      <div class="tbl-meta">
+        <span class="tbl-count">312件</span>
+        <button class="refresh-btn">↻ &ensp;更新</button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>トークンID</th>
+            <th>使用日時</th>
+            <th class="col-created">取得日時</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td title="a3f72c1b-90e4-4d2a-b5c1-111111111111">a3f72c1b…1111</td>
+            <td>2025/03/10 &ensp;14:31</td>
+            <td class="col-created muted">2025/03/10 &ensp;14:28</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="b8e23d4a-11f5-4c3b-a9d2-222222222222">b8e23d4a…2222</td>
+            <td>2025/03/10 &ensp;14:27</td>
+            <td class="col-created muted">2025/03/10 &ensp;14:20</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="c1d94e5b-22g6-4e4c-b0e3-333333333333">c1d94e5b…3333</td>
+            <td>2025/03/10 &ensp;14:19</td>
+            <td class="col-created muted">2025/03/10 &ensp;14:15</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="d2e05f6c-33h7-4f5d-c1f4-444444444444">d2e05f6c…4444</td>
+            <td>2025/03/10 &ensp;14:11</td>
+            <td class="col-created muted">2025/03/10 &ensp;14:08</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="e3f16g7d-44i8-4g6e-d2g5-555555555555">e3f16g7d…5555</td>
+            <td>2025/03/10 &ensp;14:03</td>
+            <td class="col-created muted">2025/03/10 &ensp;13:59</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="f4g27h8e-55j9-4h7f-e3h6-666666666666">f4g27h8e…6666</td>
+            <td>2025/03/10 &ensp;13:54</td>
+            <td class="col-created muted">2025/03/10 &ensp;13:50</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="g5h38i9f-66k0-4i8g-f4i7-777777777777">g5h38i9f…7777</td>
+            <td>2025/03/10 &ensp;13:45</td>
+            <td class="col-created muted">2025/03/10 &ensp;13:41</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+          <tr>
+            <td title="h6i49j0g-77l1-4j9h-g5j8-888888888888">h6i49j0g…8888</td>
+            <td>2025/03/10 &ensp;13:38</td>
+            <td class="col-created muted">2025/03/10 &ensp;13:33</td>
+            <td><span class="badge used">使用済み</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tbl-footer">最新500件を表示 &ensp;/&ensp; 1分ごとに自動更新</div>
+  </div>
+
+</div>
+
+<script>
+function showSaved(btn, id) {
+  const el = document.getElementById(id);
+  el.style.display = 'inline';
+  setTimeout(() => { el.style.display = 'none'; }, 2200);
+}
+</script>
+</body>
+</html>
